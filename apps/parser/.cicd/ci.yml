@@ -1,0 +1,97 @@
+trigger: 
+  branches:
+    include:
+    - develop
+    - release/*
+    - main
+  paths:
+    include:
+      - apps/parser
+    exclude:
+      - apps/parser/.cicd
+resources:
+  - repo: self
+
+variables:
+  - group: ci-project
+  - name: SERVICE_NAME
+    value: parser
+
+stages:
+  - stage: code_analysis
+    displayName: Code Analysis
+    pool:
+      vmImage: $(_VM_)
+    jobs:
+      - job: code_analysis
+        displayName: analyse code
+        steps:
+          - script: "echo todo: analyse your code here"
+  - stage: build_image
+    displayName: Build Docker image
+    jobs:
+      - job: build_image
+        displayName: Build Image
+        pool:
+          vmImage: $(_VM_)
+        steps:
+          - checkout: self
+            persistCredentials: true
+            clean: true
+          - task: gitversion/setup@0
+            inputs: 
+              versionSpec: '5.x'
+          - task: gitversion/execute@0
+            inputs:
+              useConfigFile: true
+              configFilePath: '$(System.DefaultWorkingDirectory)/apps/$(SERVICE_NAME)/gitversion.yml'
+          - script: |
+              TAG="$(GitVersion.SemVer)"
+              FULL_TAG="$(SERVICE_NAME)/v$TAG"
+              echo "tag to be created: $FULL_VERSION_TAG"
+              echo "##vso[task.setvariable variable=TAG;isOutput=true]$TAG"
+              echo "##vso[task.setvariable variable=FULL_TAG;isOutput=true]$FULL_TAG"
+            workingDirectory: "$(System.DefaultWorkingDirectory)"
+            name: CalculateVersion
+          - script: "echo todo: build your docker image"
+  - stage: create_tag
+    displayName: Create Tag
+    jobs:
+      - job: create_tag
+        variables:
+          TAG: $[ stageDependencies.build_image.Build.outputs['CalculateVersion.TAG'] ]
+          FULL_TAG: $[ stageDependencies.build_image.Build.outputs['CalculateVersion.FULL_TAG'] ]
+        condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], variables['BRANCH_PRE']), eq(variables['Build.SourceBranch'], variables['BRANCH_MAIN']), startsWith(variables['Build.SourceBranch'], variables['BRANCH_RELEASE'])))
+        displayName: Create Tag
+        pool:
+          vmImage: $(_VM_)
+        steps:
+          - checkout: self
+            persistCredentials: true
+            clean: true
+          - task: Bash@3
+            displayName: "Git Tagging"
+            inputs:
+              targetType: "inline"
+              script: |
+                git config user.email "azdevops@example.com"
+                git config user.name "AZ DevOps"
+                git tag -a "$(FULL_TAG)" -m "Create Tag"
+                git push origin "$(FULL_TAG)" -q
+              workingDirectory: "$(System.DefaultWorkingDirectory)"
+              failOnStderr: false
+  - stage: publish
+    displayName: Publish
+    jobs:
+      - job: Publish
+        variables:
+          ServiceVersion: $[ stageDependencies.build_image.Build.outputs['CalculateVersion.SERVICE_VERSION'] ]
+        displayName: Build and Publish
+        pool:
+          vmImage: $(_VM_)
+        steps:
+          - checkout: self
+            persistCredentials: true
+            clean: true
+          - script: "echo todo: deploy docker image"
+            displayName: deploy build

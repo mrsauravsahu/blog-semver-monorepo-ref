@@ -1,0 +1,19 @@
+tag-prefix: '{{PROJECT}}/v'
+continuous-delivery-fallback-tag: ''
+branches:
+  develop:
+    regex: develop
+    mode: ContinuousDelivery
+    increment: Minor
+    tag: 'alpha'
+  release:
+    regex: release
+    mode: ContinuousDelivery
+    increment: Minor
+    tag: 'rc'
+  main:
+    regex: main
+    mode: ContinuousDeployment
+    increment: Minor
+    tag: ''
+    track-merge-target: true
