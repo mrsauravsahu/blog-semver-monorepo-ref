@@ -14,6 +14,12 @@ jobs:
     name: gitversion
     runs-on: ubuntu-22.04
     steps:
+    - uses: actions/checkout@v2
+
+    - name: Fetch all history for all tags and branches
+      run: |
+        git fetch --prune --unshallow
+
     - name: Calculate changed services
       id: calculate_changed_services
       run: |
