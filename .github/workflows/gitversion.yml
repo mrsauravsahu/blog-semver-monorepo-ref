@@ -31,7 +31,7 @@ jobs:
         # fix multiline variables
         # from: https://github.community/t/set-output-truncates-multiline-strings/16852/5
         service_versions_txt="${service_versions_txt//$'\n'/'%0A'}"
-        echo "::set-output name=service_versions_txt::$service_versions_txt"
+        echo "::set-output name=service_versions_txt::${service_versions_txt}"
     - name: Update PR description
       run: |
         PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
