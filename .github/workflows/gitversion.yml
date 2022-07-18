@@ -33,7 +33,7 @@ jobs:
       run: |
         PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
         # from https://github.com/actions/checkout/issues/58#issuecomment-614041550
-        jq -nc '{"body": ${{ steps.calculate_service_versions.outputs.service_versions_txt }} }' | \
+        jq -nc '{"body": "${{ steps.calculate_service_versions.outputs.service_versions_txt }}" }' | \
         curl -sL  -X PATCH -d @- \
           -H "Content-Type: application/json" \
           -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
