@@ -28,6 +28,9 @@ jobs:
           service_version=$(docker run --rm -v "$(pwd):/repo" gittools/gitversion:5.10.0-alpine.3.14-6.0 /repo /config "/repo/${svc}/.gitversion.yml"  /showvariable MajorMinorPatch)
           service_versions_txt+="- ${svc}: ${service_version}"
         done
+        # fix multiline variables
+        # from: https://github.community/t/set-output-truncates-multiline-strings/16852/5
+        service_versions_txt="${service_versions_txt//$'\n'/'%0A'}"
         echo "::set-output name=service_versions_txt::$service_versions_txt"
     - name: Update PR description
       run: |
