@@ -20,8 +20,21 @@ jobs:
         changed_services=`git diff main HEAD --name-only | grep -o '^apps/\w*' | sort | uniq`
         echo "::set-output name=changed_services::$changed_services"
     - name: Calculate service versions
+      id: calculate_service_versions
       run: |
         changed_services=( ${{ steps.calculate_changed_services.outputs.changed_services }} )
+        service_versions_txt="## calculated service versions\n"
         for svc in "${changed_services[@]}"; do
-          docker run --rm -v "$(pwd):/repo" gittools/gitversion:5.10.0-alpine.3.14-6.0 /repo /config "/repo/${svc}/.gitversion.yml"
+          service_version=$(docker run --rm -v "$(pwd):/repo" gittools/gitversion:5.10.0-alpine.3.14-6.0 /repo /config "/repo/${svc}/.gitversion.yml"  /showvariable MajorMinorPatch)
+          service_versions_txt+="- ${svc}: ${service_version}"
         done
+        echo "::set-output name=service_versions_txt::$service_versions_txt"
+    - name: Update PR description
+      run: |
+        PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
+        # from https://github.com/actions/checkout/issues/58#issuecomment-614041550
+        jq -nc '{"body": ${{ steps.calculate_service_versions.outputs.service_versions_txt }} }' | \
+        curl -sL  -X PATCH -d @- \
+          -H "Content-Type: application/json" \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER"
