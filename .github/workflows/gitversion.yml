@@ -32,9 +32,7 @@ jobs:
         # fix multiline variables
         # from: https://github.com/actions/create-release/issues/64#issuecomment-638695206
         PR_BODY="${service_versions_txt}"
-        PR_BODY="${PR_BODY//'%'/'%25'}"
-        PR_BODY="${PR_BODY//$'\n'/'%0A'}"
-        PR_BODY="${PR_BODY//$'\r'/'%0D'}"
+        PR_BODY=$(printf '%s' "$PR_BODY" | jq --raw-input --slurp '.')
         echo "::set-output name=PR_BODY::$PR_BODY"
 
     - name: Event Type
@@ -44,7 +42,7 @@ jobs:
       run: |
         PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
         # from https://github.com/actions/checkout/issues/58#issuecomment-614041550
-        jq -nc '{"body": "${{ steps.calculate_service_versions.outputs.PR_BODY }}" }' | \
+        jq -nc '{"body": "${{ fromJSON(steps.calculate_service_versions.outputs.PR_BODY) }}" }' | \
         curl -sL  -X PATCH -d @- \
           -H "Content-Type: application/json" \
           -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
