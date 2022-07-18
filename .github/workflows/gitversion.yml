@@ -19,6 +19,7 @@ jobs:
       run: |
         changed_services=`git diff main HEAD --name-only | grep -o '^apps/\w*' | sort | uniq`
         echo "::set-output name=changed_services::$changed_services"
+
     - name: Calculate service versions
       id: calculate_service_versions
       run: |
@@ -30,17 +31,20 @@ jobs:
         done
         # fix multiline variables
         # from: https://github.com/actions/create-release/issues/64#issuecomment-638695206
-        pr_body="${service_versions_txt}"
-        pr_body="${pr_body//'%'/'%25'}"
-        pr_body="${pr_body//$'\n'/'%0A'}"
-        pr_body="${pr_body//$'\r'/'%0D'}"
-        echo "PR_BODY=$pr_body" >> $GITHUB_ENV
-        echo "::set-output name=service_versions_txt::${service_versions_txt}"
+        PR_BODY="${service_versions_txt}"
+        PR_BODY="${PR_BODY//'%'/'%25'}"
+        PR_BODY="${PR_BODY//$'\n'/'%0A'}"
+        PR_BODY="${PR_BODY//$'\r'/'%0D'}"
+        echo "::set-output name=PR_BODY::$PR_BODY"
+
+    - name: Event Type
+      run: echo The ${{ github.event_name }} event triggered this step.
+
     - name: Update PR description
       run: |
         PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
         # from https://github.com/actions/checkout/issues/58#issuecomment-614041550
-        jq -nc '{"body": "${PR_BODY}" }' | \
+        jq -nc '{"body": "${{ steps.calculate_service_versions.outputs.PR_BODY }}" }' | \
         curl -sL  -X PATCH -d @- \
           -H "Content-Type: application/json" \
           -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
