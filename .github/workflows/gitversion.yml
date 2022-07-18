@@ -23,7 +23,7 @@ jobs:
     - name: Calculate changed services
       id: calculate_changed_services
       run: |
-        changed_services=`git diff main $GITHUB_REF --name-only | grep -o '^apps/\w*' | sort | uniq`
+        changed_services=`git diff origin/main $GITHUB_REF --name-only | grep -o '^apps/\w*' | sort | uniq`
         echo "::set-output name=changed_services::$changed_services"
 
     - name: Calculate service versions
