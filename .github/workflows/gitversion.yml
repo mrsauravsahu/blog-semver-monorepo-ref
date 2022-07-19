@@ -1,13 +1,12 @@
 on:
   pull_request:
     branches:
+    - develop
     - main
   push:
     branches:
+    - develop
     - main
-
-env:
-  MAIN_BRANCH: refs/heads/main
 
 jobs:
   gitversion:
@@ -19,6 +18,9 @@ jobs:
     - name: Fetch all history for all tags and branches
       run: |
         git fetch --prune --unshallow
+
+    - name: Check base ref
+      run: echo ${{ env.GITHUB_BASE_REF }}
 
     - name: Calculate changed services
       id: calculate_changed_services
