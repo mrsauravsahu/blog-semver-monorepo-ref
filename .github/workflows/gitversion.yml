@@ -48,6 +48,7 @@ jobs:
       run: echo The ${{ github.event_name }} event triggered this step.
 
     - name: Update PR description
+      if: ${{ github.pull_request == 'pull_request' }}
       run: |
         PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
         # from https://github.com/actions/checkout/issues/58#issuecomment-614041550
