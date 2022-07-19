@@ -1,2 +1,2 @@
 mode: ContinuousDelivery
-tag-prefix: background-svc/v
+tag-prefix: gateway/v

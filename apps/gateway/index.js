@@ -1,7 +1,7 @@
 const http = require('http')
 const path = require('path')
 
-const app = `${path.basename(__dirname)}-service`
+const app = path.basename(__dirname)
 
 const server = http.createServer((req, res) => {
   res.writeHead(200, {'Content-Type': 'application/json'});
