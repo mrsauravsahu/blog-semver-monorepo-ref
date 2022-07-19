@@ -5,7 +5,7 @@ const app = path.basename(__dirname)
 
 const server = http.createServer((req, res) => {
   res.writeHead(200, {'Content-Type': 'application/json'});
-  res.write(JSON.stringify({ app }));
+  res.write(JSON.stringify({ app, message: null }));
   res.end();
 })
 
