@@ -20,7 +20,7 @@ jobs:
         git fetch --prune --unshallow
 
     - name: Check base ref
-      run: echo "baseref='$GITHUB_BASE_REF' refname='$GITHUB_REF_NAME' eventname='$GITHUB_EVENT_NAME'"
+      run: echo "baseref='$GITHUB_BASE_REF' ref='$GITHUB_HEAD_REF' refname='$GITHUB_REF_NAME' eventname='$GITHUB_EVENT_NAME'"
 
     - name: Calculate changed services
       id: calculate_changed_services
