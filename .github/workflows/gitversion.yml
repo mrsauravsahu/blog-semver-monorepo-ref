@@ -33,11 +33,15 @@ jobs:
       id: calculate_service_versions
       run: |
         changed_services=( ${{ fromJSON(steps.calculate_changed_services.outputs.changed_services) }} )
-        service_versions_txt="## calculated service versions\n"
-        for svc in "${changed_services[@]}"; do
-          service_version=$(docker run --rm -v "$(pwd):/repo" gittools/gitversion:5.10.0-alpine.3.14-6.0 /repo /config "/repo/${svc}/.gitversion.yml"  /showvariable MajorMinorPatch)
-          service_versions_txt="${service_versions_txt}- ${svc}: ${service_version}\n"
-        done
+        if [ "${#changed_services[@]}" = "0" ]; then
+          service_versions_txt='## no services changed\n'
+        else
+          service_versions_txt="## calculated service versions\n"
+          for svc in "${changed_services[@]}"; do
+            service_version=$(docker run --rm -v "$(pwd):/repo" gittools/gitversion:5.10.0-alpine.3.14-6.0 /repo /config "/repo/${svc}/.gitversion.yml" /showvariable MajorMinorPatch)
+            service_versions_txt="${service_versions_txt}- ${svc}: ${service_version}\n"
+          done
+        fi
         # fix multiline variables
         # from: https://github.com/actions/create-release/issues/64#issuecomment-638695206
         PR_BODY="${service_versions_txt}"
