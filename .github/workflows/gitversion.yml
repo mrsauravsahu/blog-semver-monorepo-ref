@@ -20,7 +20,7 @@ jobs:
         git fetch --prune --unshallow
 
     - name: Check base ref
-      run: echo ${{ env.GITHUB_BASE_REF }}
+      run: echo "baseref='$GITHUB_BASE_REF' refname='$GITHUB_REF_NAME' eventname='$GITHUB_EVENT_NAME'"
 
     - name: Calculate changed services
       id: calculate_changed_services
@@ -47,9 +47,6 @@ jobs:
         PR_BODY="${service_versions_txt}"
         PR_BODY=$(printf '%s' "$PR_BODY" | jq --raw-input --slurp '.')
         echo "::set-output name=PR_BODY::$PR_BODY"
-
-    - name: Event Type
-      run: echo The ${{ github.event_name }} event triggered this step.
 
     - name: Update PR description
       if: ${{ github.event_name == 'pull_request' }}
