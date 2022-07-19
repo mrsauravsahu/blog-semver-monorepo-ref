@@ -32,6 +32,7 @@ jobs:
           DIFF_DEST="HEAD"
           DIFF_SOURCE="origin/${GITHUB_BASE_REF}"
         fi
+        echo "DIFF_SOURCE='${DIFF_SOURCE}' DIFF_DEST='${DIFF_DEST}'"
         changed_services=`git diff "${DIFF_SOURCE}" "${DIFF_DEST}" --name-only | grep -o '^apps/[a-zA-Z-]*' | sort | uniq`
         changed_services=$(printf '%s' "$changed_services" | jq --raw-input --slurp '.')
         echo "::set-output name=changed_services::$changed_services"
@@ -45,14 +46,17 @@ jobs:
         else
           service_versions_txt="## service changes\n"
           for svc in "${changed_services[@]}"; do
-            service_version=$(docker run --rm -v "$(pwd):/repo" gittools/gitversion:5.10.0-alpine.3.14-6.0 /repo /config "/repo/${svc}/.gitversion.yml" /showvariable MajorMinorPatch)
-            service_versions_txt="${service_versions_txt}- ${svc}: ${service_version}\n"
+            gitversion_calc=$(docker run --rm -v "$(pwd):/repo" gittools/gitversion:5.10.0-alpine.3.14-6.0 /repo /config "/repo/${svc}/.gitversion.yml")
+            service_version=$(echo "${gitversion_calc}" | jq -r '.MajorMinorPatch')
+            echo "calculation for ${svc}"; echo "${gitversion_calc}"
+            service_versions_txt+="- ${svc}: ${service_version}\n"
           done
         fi
         # fix multiline variables
         # from: https://github.com/actions/create-release/issues/64#issuecomment-638695206
         PR_BODY="${service_versions_txt}"
         PR_BODY=$(printf '%s' "$PR_BODY" | jq --raw-input --slurp '.')
+        echo "${PR_BODY}"
         echo "::set-output name=PR_BODY::$PR_BODY"
 
     - name: Update PR description
