@@ -8,6 +8,9 @@ on:
     - develop
     - main
 
+env:
+  GITVERSION: 'gittools/gitversion:5.10.0-alpine.3.14-6.0'
+
 jobs:
   gitversion:
     name: gitversion
@@ -45,8 +48,9 @@ jobs:
           service_versions_txt='## service changes\nNo services changed\n'
         else
           service_versions_txt="## service changes\n"
+          docker pull ${{ env.GITVERSION }}
           for svc in "${changed_services[@]}"; do
-            gitversion_calc=$(docker run --rm -v "$(pwd):/repo" gittools/gitversion:5.10.0-alpine.3.14-6.0 /repo /config "/repo/${svc}/.gitversion.yml")
+            gitversion_calc=$(docker run --rm -v "$(pwd):/repo" ${{ env.GITVERSION }} /repo /config "/repo/${svc}/.gitversion.yml")
             service_version=$(echo "${gitversion_calc}" | jq -r '.MajorMinorPatch')
             echo "calculation for ${svc}"; echo "${gitversion_calc}"
             service_versions_txt+="- ${svc}: ${service_version}\n"
