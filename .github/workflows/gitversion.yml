@@ -50,9 +50,9 @@ jobs:
           service_versions_txt="## service changes\n"
           docker pull ${{ env.GITVERSION }}
           for svc in "${changed_services[@]}"; do
+            echo "calculation for ${svc}"
             gitversion_calc=$(docker run --rm -v "$(pwd):/repo" ${{ env.GITVERSION }} /repo /config "/repo/${svc}/.gitversion.yml")
             service_version=$(echo "${gitversion_calc}" | jq -r '.MajorMinorPatch')
-            echo "calculation for ${svc}"
             echo "${gitversion_calc}"
             service_versions_txt="- ${svc} - ${service_version}\n"
           done
