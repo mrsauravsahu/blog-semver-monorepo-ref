@@ -41,6 +41,9 @@ jobs:
         echo "::set-output name=changed_services::$changed_services"
         echo "::set-output name=diff_source::$DIFF_SOURCE"
         echo "::set-output name=diff_dest::$DIFF_DEST"
+        echo "DIFF_SOURCE='$DIFF_SOURCE'"
+        echo "DIFF_DEST='$DIFF_DEST'"
+        echo "changed_services='$(echo $changed_services | sed 's/\n/, /')'"
 
     - name: Checkout to branch
       run: git checkout ${{ steps.calculate_changed_services.outputs.diff_dest }}
@@ -53,7 +56,6 @@ jobs:
           service_versions_txt='## service changes\nNo services changed\n'
         else
           service_versions_txt="## service changes\n"
-          docker pull ${{ env.GITVERSION }}
           for svc in "${changed_services[@]}"; do
             echo "calculation for ${svc}"
             docker run --rm -v "$(pwd):/repo" ${{ env.GITVERSION }} /repo /config "/repo/${svc}/.gitversion.yml"
