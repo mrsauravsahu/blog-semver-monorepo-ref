@@ -38,8 +38,8 @@ jobs:
         changed_services=`git diff "${DIFF_SOURCE}" "${DIFF_DEST}" --name-only | grep -o '^apps/[a-zA-Z-]*' | sort | uniq`
         changed_services=$(printf '%s' "$changed_services" | jq --raw-input --slurp '.')
         echo "::set-output name=changed_services::$changed_services"
-        echo "::set-output name=diff_source::$diff_source"
-        echo "::set-output name=diff_dest::$diff_dest"
+        echo "::set-output name=diff_source::$DIFF_SOURCE"
+        echo "::set-output name=diff_dest::$DIFF_DEST"
 
     - name: Checkout to branch
       run: git checkout ${{ steps.calculate_changed_services.outputs.diff_dest }}
