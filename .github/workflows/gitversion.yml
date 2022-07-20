@@ -37,7 +37,7 @@ jobs:
           DIFF_SOURCE="${GITHUB_BASE_REF}"
         fi
         echo "DIFF_SOURCE='${DIFF_SOURCE}' DIFF_DEST='${DIFF_DEST}'"
-        changed_services=`git diff "${DIFF_SOURCE}" "${DIFF_DEST}" --name-only | grep -o '^apps/[a-zA-Z-]*' | sort | uniq`
+        changed_services=`git diff "origin/${DIFF_SOURCE}" "origin/${DIFF_DEST}" --name-only | grep -o '^apps/[a-zA-Z-]*' | sort | uniq`
         changed_services=$(printf '%s' "$changed_services" | jq --raw-input --slurp '.')
         echo "::set-output name=changed_services::$changed_services"
         echo "::set-output name=diff_source::$DIFF_SOURCE"
