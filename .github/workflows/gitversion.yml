@@ -52,8 +52,9 @@ jobs:
           for svc in "${changed_services[@]}"; do
             gitversion_calc=$(docker run --rm -v "$(pwd):/repo" ${{ env.GITVERSION }} /repo /config "/repo/${svc}/.gitversion.yml")
             service_version=$(echo "${gitversion_calc}" | jq -r '.MajorMinorPatch')
-            echo "calculation for ${svc}"; echo "${gitversion_calc}"
-            service_versions_txt+="- ${svc}: ${service_version}\n"
+            echo "calculation for ${svc}"
+            echo "${gitversion_calc}"
+            service_versions_txt="- ${svc} - ${service_version}\n"
           done
         fi
         # fix multiline variables
