@@ -28,11 +28,11 @@ jobs:
       id: calculate_changed_services
       run: |
         if [ "${GITHUB_EVENT_NAME}" = 'push' ]; then
-          DIFF_DEST="origin/${GITHUB_REF_NAME}"
+          DIFF_DEST="${GITHUB_REF_NAME}"
           DIFF_SOURCE="${DIFF_DEST}~1"
         else
-          DIFF_DEST="origin/${GITHUB_HEAD_REF}"
-          DIFF_SOURCE="origin/${GITHUB_BASE_REF}"
+          DIFF_DEST="${GITHUB_HEAD_REF}"
+          DIFF_SOURCE="${GITHUB_BASE_REF}"
         fi
         echo "DIFF_SOURCE='${DIFF_SOURCE}' DIFF_DEST='${DIFF_DEST}'"
         changed_services=`git diff "${DIFF_SOURCE}" "${DIFF_DEST}" --name-only | grep -o '^apps/[a-zA-Z-]*' | sort | uniq`
