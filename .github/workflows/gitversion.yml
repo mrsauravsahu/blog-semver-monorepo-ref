@@ -32,7 +32,7 @@ jobs:
           DIFF_DEST="origin/${GITHUB_REF_NAME}"
           DIFF_SOURCE="${DIFF_DEST}~1"
         else
-          DIFF_DEST="HEAD"
+          DIFF_DEST="origin/${GITHUB_HEAD_REF}"
           DIFF_SOURCE="origin/${GITHUB_BASE_REF}"
         fi
         echo "DIFF_SOURCE='${DIFF_SOURCE}' DIFF_DEST='${DIFF_DEST}'"
