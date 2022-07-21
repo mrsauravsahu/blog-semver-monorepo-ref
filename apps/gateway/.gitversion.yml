@@ -1,2 +1,4 @@
 mode: ContinuousDelivery
 tag-prefix: gateway/v
+next-version: 1.0.0
+
