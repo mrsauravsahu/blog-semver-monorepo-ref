@@ -10,7 +10,7 @@ on:
 
 env:
   GITVERSION: 'gittools/gitversion:5.10.0-alpine.3.14-6.0'
-  MAIN_BRANCHES: ("origin/develop" "origin/main")
+  MAIN_BRANCHES: ("develop" "main")
 
 jobs:
   gitversion:
@@ -30,11 +30,11 @@ jobs:
       id: calculate_changed_services
       run: |
         if [ "${GITHUB_EVENT_NAME}" = 'push' ]; then
-          DIFF_DEST="origin/${GITHUB_REF_NAME}"
-          DIFF_SOURCE="origin/$(git rev-parse "${DIFF_DEST}"^1)"
+          DIFF_DEST="${GITHUB_REF_NAME}"
+          DIFF_SOURCE=$(git rev-parse "${DIFF_DEST}"^1)
         else
-          DIFF_DEST="origin/${GITHUB_HEAD_REF}"
-          DIFF_SOURCE="origin/${GITHUB_BASE_REF}"
+          DIFF_DEST="${GITHUB_HEAD_REF}"
+          DIFF_SOURCE="${GITHUB_BASE_REF}"
         fi
         changed_services=`git diff "${DIFF_SOURCE}" "${DIFF_DEST}" --name-only | grep -o '^apps/[a-zA-Z-]*' | sort | uniq`
         changed_services=$(printf '%s' "$changed_services" | jq --raw-input --slurp '.')
