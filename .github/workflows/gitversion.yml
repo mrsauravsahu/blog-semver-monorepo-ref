@@ -33,7 +33,7 @@ jobs:
         else
           DIFF_DEST="${GITHUB_HEAD_REF}"
         fi
-        git checkout $DIFF_DEST}
+        git checkout ${DIFF_DEST}
 
     - name: Calculate changed services
       id: calculate_changed_services
