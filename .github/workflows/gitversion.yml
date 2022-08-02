@@ -86,6 +86,8 @@ jobs:
     - name: Tag build
       if: ${{ contains(env.MAIN_BRANCHES, steps.calculate_changed_services.outputs.diff_dest) != true }}
       run: |
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions"
         changed_services=( ${{ fromJSON(steps.calculate_changed_services.outputs.changed_services) }} )
         for svc in "${changed_services[@]}"; do
           echo "calculation for ${svc}"
