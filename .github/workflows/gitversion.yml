@@ -21,7 +21,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Fetch all history for all tags and branches
-      run: git fetch --all && git checkout develop && git checkout main
+      run: git fetch --unshallow && git checkout develop && git checkout main
 
     #- name: Check base ref
     #  run: echo "baseref='$GITHUB_BASE_REF' ref='$GITHUB_REF' headref='$GITHUB_HEAD_REF' refname='$GITHUB_REF_NAME' eventname='$GITHUB_EVENT_NAME'"
