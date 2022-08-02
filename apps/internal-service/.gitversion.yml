@@ -1,4 +1,2 @@
 mode: ContinuousDelivery
 tag-prefix: internal-service/v
-next-version: 1.0.0
-
