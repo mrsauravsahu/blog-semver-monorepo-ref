@@ -11,6 +11,7 @@ on:
 env:
   GITVERSION: 'gittools/gitversion:5.10.0-alpine.3.14-6.0'
   MAIN_BRANCHES: ("develop" "main")
+  GITVERSION_TAG_PROPERTY: .SemVer
 
 jobs:
   gitversion:
@@ -66,7 +67,7 @@ jobs:
             echo "calculation for ${svc}"
             docker run --rm -v "$(pwd):/repo" ${{ env.GITVERSION }} /repo /config "/repo/${svc}/.gitversion.yml"
             gitversion_calc=$(docker run --rm -v "$(pwd):/repo" ${{ env.GITVERSION }} /repo /config "/repo/${svc}/.gitversion.yml")
-            service_version=$(echo "${gitversion_calc}" | jq -r '.MajorMinorPatch')
+            service_version=$(echo "${gitversion_calc}" | jq -r "${GITVERSION_TAG_PROPERTY}" )
             echo "${gitversion_calc}"
             service_versions_txt+="- ${svc} - v${service_version}\n"
           done
@@ -100,7 +101,7 @@ jobs:
           echo "calculation for ${svc}"
           docker run --rm -v "$(pwd):/repo" ${{ env.GITVERSION }} /repo /config "/repo/${svc}/.gitversion.yml"
           gitversion_calc=$(docker run --rm -v "$(pwd):/repo" ${{ env.GITVERSION }} /repo /config "/repo/${svc}/.gitversion.yml")
-          service_version=$(echo "${gitversion_calc}" | jq -r '.MajorMinorPatch')
+          service_version=$(echo "${gitversion_calc}" | jq -r "${GITVERSION_TAG_PROPERTY}")
           echo "${gitversion_calc}"
           service_versions_txt+="- ${svc} - v${service_version}\n"
           git tag -a "${svc}/v${service_version}" -m "${svc}/v${service_version}"
