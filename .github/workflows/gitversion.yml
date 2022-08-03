@@ -11,7 +11,7 @@ on:
 env:
   GITVERSION: 'gittools/gitversion:5.10.0-alpine.3.14-6.0'
   MAIN_BRANCHES: ("develop" "main")
-  GITVERSION_TAG_PROPERTY: .SemVer
+  GITVERSION_TAG_PROPERTY: .MajorMinorPatch,.PreReleaseLabelWithDash
 
 jobs:
   gitversion:
@@ -65,10 +65,9 @@ jobs:
           service_versions_txt="## service changes\n"
           for svc in "${changed_services[@]}"; do
             echo "calculation for ${svc}"
-            docker run --rm -v "$(pwd):/repo" ${{ env.GITVERSION }} /repo /config "/repo/${svc}/.gitversion.yml"
-            gitversion_calc=$(docker run --rm -v "$(pwd):/repo" ${{ env.GITVERSION }} /repo /config "/repo/${svc}/.gitversion.yml")
-            service_version=$(echo "${gitversion_calc}" | jq -r "${GITVERSION_TAG_PROPERTY}" )
-            echo "${gitversion_calc}"
+            docker run --rm -v "$(pwd):/repo" ${GITVERSION} /repo /config "/repo/${svc}/.gitversion.yml"
+            gitversion_calc=$(docker run --rm -v "$(pwd):/repo" ${GITVERSION} /repo /config "/repo/${svc}/.gitversion.yml")
+            service_version=$(echo "${gitversion_calc}" | jq -r "[${GITVERSION_TAG_PROPERTY}] | join(\"\")")
             service_versions_txt+="- ${svc} - v${service_version}\n"
           done
         fi
@@ -99,10 +98,9 @@ jobs:
         changed_services=( ${{ fromJSON(steps.calculate_changed_services.outputs.changed_services) }} )
         for svc in "${changed_services[@]}"; do
           echo "calculation for ${svc}"
-          docker run --rm -v "$(pwd):/repo" ${{ env.GITVERSION }} /repo /config "/repo/${svc}/.gitversion.yml"
-          gitversion_calc=$(docker run --rm -v "$(pwd):/repo" ${{ env.GITVERSION }} /repo /config "/repo/${svc}/.gitversion.yml")
-          service_version=$(echo "${gitversion_calc}" | jq -r "${GITVERSION_TAG_PROPERTY}")
-          echo "${gitversion_calc}"
+          docker run --rm -v "$(pwd):/repo" ${GITVERSION} /repo /config "/repo/${svc}/.gitversion.yml"
+          gitversion_calc=$(docker run --rm -v "$(pwd):/repo" ${GITVERSION} /repo /config "/repo/${svc}/.gitversion.yml")
+          service_version=$(echo "${gitversion_calc}" | jq -r "[${GITVERSION_TAG_PROPERTY}] | join(\"\")")
           service_versions_txt+="- ${svc} - v${service_version}\n"
           svc_without_prefix=$(echo "${svc}" | sed "s|^apps/||")
           git tag -a "${svc_without_prefix}/v${service_version}" -m "${svc_without_prefix}/v${service_version}"

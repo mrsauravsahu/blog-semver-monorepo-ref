@@ -7,7 +7,8 @@ const server = http.createServer((req, res) => {
   res.writeHead(200, {'Content-Type': 'application/json'});
   res.write(JSON.stringify({
     app,
-    version: '1.0.0'
+    version: '1.0.0',
+    latestFeature: 'dash in service version'
   }));
   res.end();
 })
