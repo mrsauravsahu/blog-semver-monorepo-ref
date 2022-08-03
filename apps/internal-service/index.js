@@ -1,18 +1,25 @@
-const http = require('http')
 const path = require('path')
+const process = require('process')
+const express = require('express')
 
-const app = path.basename(__dirname)
+const appName = path.basename(__dirname)
+const app = express()
 
-const server = http.createServer((req, res) => {
+app.get('/', (_, res) => {
   res.writeHead(200, {'Content-Type': 'application/json'});
   res.write(JSON.stringify({
-    app,
-    version: '1.0.0',
-    latestFeature: 'dash in service version'
+    app: appName,
+    version: '1.0.0'
   }));
   res.end();
 })
 
 const port  = process.env.PORT || 80
-console.log(`Starting server at http://localhost:${port}`)
-server.listen(port, '0.0.0.0')
+
+app.listen(port, '0.0.0.0', (err) => {
+  if (err) {
+    console.error(err);
+    process.exit(1)
+  }
+  console.log(`Starting server at http://localhost:${port}`)
+})
