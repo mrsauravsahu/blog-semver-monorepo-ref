@@ -11,7 +11,7 @@ on:
 env:
   GITVERSION: 'gittools/gitversion:5.10.0-alpine.3.14-6.0'
   MAIN_BRANCHES: ("develop" "main")
-  GITVERSION_TAG_PROPERTY_NAME_: .Semver
+  GITVERSION_TAG_PROPERTY_DEFAULT: .Semver
   GITVERSION_TAG_PROPERTY_DEVELOP: .SemVer
   GITVERSION_TAG_PROPERTY_MAIN: .MajorMinorPatch
 
@@ -69,7 +69,7 @@ jobs:
             echo "calculation for ${svc}"
             docker run --rm -v "$(pwd):/repo" ${GITVERSION} /repo /config "/repo/${svc}/.gitversion.yml"
             gitversion_calc=$(docker run --rm -v "$(pwd):/repo" ${GITVERSION} /repo /config "/repo/${svc}/.gitversion.yml")
-            GITVERSION_TAG_PROPERTY_NAME="GITVERSION_TAG_PROPERTY_NAME_"
+            GITVERSION_TAG_PROPERTY_NAME="GITVERSION_TAG_PROPERTY_DEFAULT"
             GITVERSION_TAG_PROPERTY=${!GITVERSION_TAG_PROPERTY_NAME}
             service_version=$(echo "${gitversion_calc}" | jq -r "[${GITVERSION_TAG_PROPERTY}] | join(\"\")")
             service_versions_txt+="- ${svc} - v${service_version}\n"
