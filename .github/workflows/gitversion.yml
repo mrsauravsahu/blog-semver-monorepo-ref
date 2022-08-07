@@ -49,7 +49,7 @@ jobs:
           DIFF_DEST="${GITHUB_HEAD_REF}"
           DIFF_SOURCE="${GITHUB_BASE_REF}"
         fi
-        changed_services=`git diff "${DIFF_SOURCE}" "${DIFF_DEST}" --name-only | grep -o '^apps/[a-zA-Z-]*' | sort | uniq`
+        changed_services=`git diff "${DIFF_SOURCE}" "${DIFF_DEST}" --name-only | grep -o '^(apps|common)/[a-zA-Z-]*' | sort | uniq`
         changed_services=$(printf '%s' "$changed_services" | jq --raw-input --slurp '.')
         echo "::set-output name=changed_services::$changed_services"
         echo "::set-output name=diff_source::$DIFF_SOURCE"
@@ -109,7 +109,7 @@ jobs:
           GITVERSION_TAG_PROPERTY=${!GITVERSION_TAG_PROPERTY_NAME}
           service_version=$(echo "${gitversion_calc}" | jq -r "[${GITVERSION_TAG_PROPERTY}] | join(\"\")")
           service_versions_txt+="- ${svc} - v${service_version}\n"
-          svc_without_prefix=$(echo "${svc}" | sed "s|^apps/||")
+          svc_without_prefix=$(echo "${svc}" | sed "s|^(apps|common)/||")
           git tag -a "${svc_without_prefix}/v${service_version}" -m "${svc_without_prefix}/v${service_version}"
           git push origin "${svc_without_prefix}/v${service_version}"
         done
