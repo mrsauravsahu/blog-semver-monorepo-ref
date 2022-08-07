@@ -49,7 +49,12 @@ jobs:
           DIFF_DEST="${GITHUB_HEAD_REF}"
           DIFF_SOURCE="${GITHUB_BASE_REF}"
         fi
-        changed_services=`git diff "${DIFF_SOURCE}" "${DIFF_DEST}" --name-only | grep -o '^(apps|common)/[a-zA-Z-]*' | sort | uniq`
+
+        if [ "$(git diff develop HEAD --name-only | grep -o '^common1/' > /dev/null && echo 'common changed')" == 'common changed' ]; then
+          changed_services=`ls -1 apps`
+        else
+          changed_services=`git diff "${DIFF_SOURCE}" "${DIFF_DEST}" --name-only | grep -o '^(apps|common)/[a-zA-Z-]*' | sort | uniq`
+        fi
         changed_services=$(printf '%s' "$changed_services" | jq --raw-input --slurp '.')
         echo "::set-output name=changed_services::$changed_services"
         echo "::set-output name=diff_source::$DIFF_SOURCE"
