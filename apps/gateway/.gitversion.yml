@@ -1,3 +1,7 @@
 mode: ContinuousDelivery
-commit-message-incrementing: Enabled
 tag-prefix: gateway/v
+feature:
+  regex: ^(feat|fix|improv|chore)[/-]
+  mode: ContinuousDelivery
+  commit-message-incrementing: Enabled
+  tag: alpha
