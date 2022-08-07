@@ -1,2 +1,7 @@
-mode: ContinuousDelivery
+mode: MainLine
 tag-prefix: internal-service/v
+branches:
+  feature:
+    regex: ^(feat|fix|improv|chore)[/-]
+    commit-message-incrementing: Enabled
+    tag: alpha
