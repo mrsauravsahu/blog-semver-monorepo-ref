@@ -3,6 +3,5 @@ tag-prefix: gateway/v
 branches:
   feature:
     regex: ^(feat|fix|improv|chore)[/-]
-    mode: MainLine
     commit-message-incrementing: Enabled
     tag: alpha
