@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@monotools/express-server": "file:../../common/express-server",
     "express": "^4.18.1"
   },
   "devDependencies": {
