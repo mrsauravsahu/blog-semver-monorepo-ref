@@ -63,9 +63,9 @@ jobs:
       run: |
         changed_services=( ${{ fromJSON(steps.calculate_changed_services.outputs.changed_services) }} )
         if [ "${#changed_services[@]}" = "0" ]; then
-          service_versions_txt='## service changes\nNo services changed\n'
+          service_versions_txt='## deployables impacted\nNo services changed\n'
         else
-          service_versions_txt="## service changes\n"
+          service_versions_txt="## deployables impacted\n"
           for svc in "${changed_services[@]}"; do
             echo "calculation for ${svc}"
             docker run --rm -v "$(pwd):/repo" ${GITVERSION} /repo /config "/repo/${svc}/.gitversion.yml"
