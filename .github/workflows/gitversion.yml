@@ -78,7 +78,7 @@ jobs:
             GITVERSION_TAG_PROPERTY_NAME="GITVERSION_TAG_PROPERTY_PULL_REQUESTS"
             GITVERSION_TAG_PROPERTY=${!GITVERSION_TAG_PROPERTY_NAME}
             service_version=$(echo "${gitversion_calc}" | jq -r "[${GITVERSION_TAG_PROPERTY}] | join(\"\")")
-            service_versions_txt+="- ${svc} - v${service_version}\n"
+            service_versions_txt+="- ${svc}\n"
           done
         fi
         # fix multiline variables
