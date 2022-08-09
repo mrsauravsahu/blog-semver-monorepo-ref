@@ -1,6 +1,11 @@
 const path = require('path')
 const process = require('process')
-const { app, listen } = require('@monotools/express-server')
+const { server: app, listen } = require('@monotools/express-server')
+const routes = require('./routes')
+
+routes.forEach(r => {
+  app.use(r.route, r.router)
+})
 
 const appName = path.basename(__dirname)
 
