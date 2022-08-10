@@ -10,4 +10,6 @@ branches:
     commit-message-incrementing: Enabled
     tag: alpha
     increment: Minor
-
+  hotfix:
+    tag: ''
+    increment: Patch
