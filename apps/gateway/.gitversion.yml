@@ -5,3 +5,15 @@ branches:
     regex: ^(feat|fix|improv|chore)[/-]
     commit-message-incrementing: Enabled
     tag: alpha
+  release:
+    regex: ^releases?[/-]
+    mode: ContinuousDelivery
+    tag: beta
+    increment: None
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    source-branches: [ 'develop' ]
+    tracks-release-branches: false
+    is-release-branch: true
+    is-mainline: false
+    pre-release-weight: 30000

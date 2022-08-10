@@ -7,6 +7,7 @@ on:
     branches:
     - develop
     - main
+    - 'release/**'
 
 env:
   GITVERSION: 'gittools/gitversion:5.10.0-alpine.3.14-6.0'
@@ -14,6 +15,7 @@ env:
   GITVERSION_TAG_PROPERTY_PULL_REQUESTS: .MajorMinorPatch
   GITVERSION_TAG_PROPERTY_DEFAULT: .SemVer
   GITVERSION_TAG_PROPERTY_DEVELOP: .SemVer
+  GITVERSION_TAG_PROPERTY_RELEASE: .SemVer
   GITVERSION_TAG_PROPERTY_MAIN: .MajorMinorPatch
 
 jobs:
@@ -49,7 +51,12 @@ jobs:
           DIFF_DEST="${GITHUB_HEAD_REF}"
           DIFF_SOURCE="${GITHUB_BASE_REF}"
         fi
+        # use develop as source if current branch is a release branch
+        if [ "$(echo "${DIFF_DEST}" | grep -o '^release/')" = "release/" ]; then
+          DIFF_SOURCE="$(git merge-base develop ${DIFF_DEST})"
+        fi
 
+        # service change calculation with diff - ideally use something like 'plz' or 'bazel'
         if [ "$(git diff "${DIFF_SOURCE}" "${DIFF_DEST}" --name-only | grep -o '^common/' > /dev/null && echo 'common changed')" = 'common changed' ]; then
           changed_services=`ls -1 apps | xargs -n 1 printf 'apps/%s\n'`
         else
@@ -100,7 +107,7 @@ jobs:
           "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER"
 
     - name: Tag build
-      if: ${{ github.event_name == 'push' && contains(env.MAIN_BRANCHES, steps.calculate_changed_services.outputs.diff_dest) }}
+      if: ${{ github.event_name == 'push' && (startsWith(steps.calculate_changed_services.outputs.diff_dest, 'release') || contains(env.MAIN_BRANCHES, steps.calculate_changed_services.outputs.diff_dest)) }}
       run: |
         # https://github.com/orgs/community/discussions/26560
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -110,7 +117,7 @@ jobs:
           echo "calculation for ${svc}"
           docker run --rm -v "$(pwd):/repo" ${GITVERSION} /repo /config "/repo/${svc}/.gitversion.yml"
           gitversion_calc=$(docker run --rm -v "$(pwd):/repo" ${GITVERSION} /repo /config "/repo/${svc}/.gitversion.yml")
-          GITVERSION_TAG_PROPERTY_NAME="GITVERSION_TAG_PROPERTY_$(echo '${{ steps.calculate_changed_services.outputs.diff_dest }}' | tr '[[:lower:]]' '[[:upper:]]')"
+          GITVERSION_TAG_PROPERTY_NAME="GITVERSION_TAG_PROPERTY_$(echo '${{ steps.calculate_changed_services.outputs.diff_dest }}' | sed 's|/.*$||' | tr '[[:lower:]]' '[[:upper:]]')"
           GITVERSION_TAG_PROPERTY=${!GITVERSION_TAG_PROPERTY_NAME}
           service_version=$(echo "${gitversion_calc}" | jq -r "[${GITVERSION_TAG_PROPERTY}] | join(\"\")")
           service_versions_txt+="- ${svc} - v${service_version}\n"
