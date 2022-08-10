@@ -8,6 +8,7 @@ on:
     - develop
     - main
     - 'release/**'
+    - 'hotfix/**'
 
 env:
   GITVERSION: 'gittools/gitversion:5.10.0-alpine.3.14-6.0'
@@ -16,6 +17,7 @@ env:
   GITVERSION_TAG_PROPERTY_DEFAULT: .SemVer
   GITVERSION_TAG_PROPERTY_DEVELOP: .SemVer
   GITVERSION_TAG_PROPERTY_RELEASE: .SemVer
+  GITVERSION_TAG_PROPERTY_HOTFIX: .MajorMinorPatch
   GITVERSION_TAG_PROPERTY_MAIN: .MajorMinorPatch
 
 jobs:
