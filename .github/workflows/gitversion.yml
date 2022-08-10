@@ -8,6 +8,7 @@ on:
     - develop
     - main
     - 'release/**'
+    - 'hotfix/**'
 
 env:
   GITVERSION: 'gittools/gitversion:5.10.0-alpine.3.14-6.0'
@@ -16,6 +17,7 @@ env:
   GITVERSION_TAG_PROPERTY_DEFAULT: .SemVer
   GITVERSION_TAG_PROPERTY_DEVELOP: .SemVer
   GITVERSION_TAG_PROPERTY_RELEASE: .SemVer
+  GITVERSION_TAG_PROPERTY_HOTFIX: .MajorMinorPatch
   GITVERSION_TAG_PROPERTY_MAIN: .MajorMinorPatch
 
 jobs:
@@ -53,6 +55,10 @@ jobs:
         fi
         # use main as source if current branch is a release branch
         if [ "$(echo "${DIFF_DEST}" | grep -o '^release/')" = "release/" ]; then
+          DIFF_SOURCE="main"
+        fi
+        # use main as source if current branch is a hotfix branch
+        if [ "$(echo "${DIFF_DEST}" | grep -o '^hotfix/')" = "hotfix/" ]; then
           DIFF_SOURCE="main"
         fi
 
@@ -107,7 +113,7 @@ jobs:
           "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER"
 
     - name: Tag build
-      if: ${{ github.event_name == 'push' && (startsWith(steps.calculate_changed_services.outputs.diff_dest, 'release') || contains(env.MAIN_BRANCHES, steps.calculate_changed_services.outputs.diff_dest)) }}
+      if: ${{ github.event_name == 'push' && (startsWith(steps.calculate_changed_services.outputs.diff_dest, 'release') || startsWith(steps.calculate_changed_services.outputs.diff_dest, 'hotfix') || contains(env.MAIN_BRANCHES, steps.calculate_changed_services.outputs.diff_dest)) }}
       run: |
         # https://github.com/orgs/community/discussions/26560
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
