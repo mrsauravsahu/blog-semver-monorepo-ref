@@ -12,7 +12,7 @@ on:
 env:
   GITVERSION: 'gittools/gitversion:5.10.0-alpine.3.14-6.0'
   MAIN_BRANCHES: ("develop" "main")
-  GITVERSION_TAG_PROPERTY_PULL_REQUESTS: .MajorMinorPatch
+  GITVERSION_TAG_PROPERTY_PULL_REQUESTS: .SemVer
   GITVERSION_TAG_PROPERTY_DEFAULT: .SemVer
   GITVERSION_TAG_PROPERTY_DEVELOP: .SemVer
   GITVERSION_TAG_PROPERTY_RELEASE: .SemVer
@@ -85,7 +85,7 @@ jobs:
             GITVERSION_TAG_PROPERTY_NAME="GITVERSION_TAG_PROPERTY_PULL_REQUESTS"
             GITVERSION_TAG_PROPERTY=${!GITVERSION_TAG_PROPERTY_NAME}
             service_version=$(echo "${gitversion_calc}" | jq -r "[${GITVERSION_TAG_PROPERTY}] | join(\"\")")
-            service_versions_txt+="- ${svc}\n"
+            service_versions_txt+="- ${svc}\n - v${service_version}"
           done
         fi
         # fix multiline variables
