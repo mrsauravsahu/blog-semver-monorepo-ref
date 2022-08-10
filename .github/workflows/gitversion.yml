@@ -50,7 +50,12 @@ jobs:
           DIFF_DEST="${GITHUB_HEAD_REF}"
           DIFF_SOURCE="${GITHUB_BASE_REF}"
         fi
+        # use develop as source if current branch is a release branch
+        if [ "$(echo "${DIFF_DEST}" | grep -o '^release/')" = "release/" ]; then
+          DIFF_SOURCE="$(git merge-base develop ${DIFF_DEST})"
+        fi
 
+        # service change calculation with diff - ideally use something like 'plz' or 'bazel'
         if [ "$(git diff "${DIFF_SOURCE}" "${DIFF_DEST}" --name-only | grep -o '^common/' > /dev/null && echo 'common changed')" = 'common changed' ]; then
           changed_services=`ls -1 apps | xargs -n 1 printf 'apps/%s\n'`
         else
