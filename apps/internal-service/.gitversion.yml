@@ -2,10 +2,12 @@ mode: MainLine
 tag-prefix: internal-service/v
 branches:
   main:
-    increment: Inherit
+    increment: Minor
   release:
-    increment: Inherit
+    increment: Minor
   feature:
     regex: ^(feat|fix|improv|chore)[/-]
     commit-message-incrementing: Enabled
     tag: alpha
+    increment: Minor
+
