@@ -11,5 +11,5 @@ branches:
     tag: alpha
     increment: Minor
   hotfix:
-    tag: ''
+    tag: hotfix
     increment: Patch
