@@ -4,12 +4,12 @@ branches:
   main:
     increment: Minor
   release:
-    increment: Minor
+    increment: None
   feature:
     regex: ^(feat|fix|improv|chore)[/-]
     commit-message-incrementing: Enabled
     tag: alpha
     increment: Minor
   hotfix:
-    tag: ''
+    tag: hotfix
     increment: Patch
