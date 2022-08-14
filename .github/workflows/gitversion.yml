@@ -17,7 +17,7 @@ env:
   GITVERSION_TAG_PROPERTY_DEFAULT: .SemVer
   GITVERSION_TAG_PROPERTY_DEVELOP: .MajorMinorPatch,.PreReleaseLabelWithDash
   GITVERSION_TAG_PROPERTY_RELEASE: .MajorMinorPatch,.PreReleaseLabelWithDash
-  GITVERSION_TAG_PROPERTY_HOTFIX: .SemVer
+  GITVERSION_TAG_PROPERTY_HOTFIX: .MajorMinorPatch,.PreReleaseLabelWithDash
   GITVERSION_TAG_PROPERTY_MAIN: .MajorMinorPatch
 
 jobs:
