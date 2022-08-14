@@ -128,7 +128,7 @@ jobs:
           service_version=$(echo "${gitversion_calc}" | jq -r "[${GITVERSION_TAG_PROPERTY}] | join(\"\")")
           service_versions_txt+="- ${svc} - v${service_version}\n"
           svc_without_prefix=$(echo "${svc}" | sed "s|^apps/||")
-          previous_commit_count=$(git tag -l | grep "^${svc_without_prefix}/v$(echo "${gitversion_calc}" | jq ".SemVer")" | grep -o -E '\.\d+$' | grep -o -E '\d+$' | sort -n | head -1)
+          previous_commit_count=$(git tag -l | grep "^${svc_without_prefix}/v$(echo "${gitversion_calc}" | jq ".SemVer")-$(echo "${gitversion_calc}" | jq ".PreReleaseLabel")" | grep -o -E '\.\d+$' | grep -o -E '\d+$' | sort -n | head -1)
           next_commit_count=$((previous_commit_count+1))
           full_service_version="${service_version}.${next_commit_count}"
           git tag -a "${svc_without_prefix}/v${full_service_version}" -m "${svc_without_prefix}/v${full_service_version}"
