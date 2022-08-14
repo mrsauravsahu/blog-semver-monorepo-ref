@@ -15,8 +15,8 @@ env:
   MAIN_BRANCHES: ("develop" "main")
   GITVERSION_TAG_PROPERTY_PULL_REQUESTS: .SemVer
   GITVERSION_TAG_PROPERTY_DEFAULT: .SemVer
-  GITVERSION_TAG_PROPERTY_DEVELOP: .SemVer
-  GITVERSION_TAG_PROPERTY_RELEASE: .SemVer
+  GITVERSION_TAG_PROPERTY_DEVELOP: .MajorMinorPatch,.PreReleaseLabelWithDash
+  GITVERSION_TAG_PROPERTY_RELEASE: .MajorMinorPatch,.PreReleaseLabelWithDash
   GITVERSION_TAG_PROPERTY_HOTFIX: .SemVer
   GITVERSION_TAG_PROPERTY_MAIN: .MajorMinorPatch
 
@@ -128,6 +128,9 @@ jobs:
           service_version=$(echo "${gitversion_calc}" | jq -r "[${GITVERSION_TAG_PROPERTY}] | join(\"\")")
           service_versions_txt+="- ${svc} - v${service_version}\n"
           svc_without_prefix=$(echo "${svc}" | sed "s|^apps/||")
-          git tag -a "${svc_without_prefix}/v${service_version}" -m "${svc_without_prefix}/v${service_version}"
-          git push origin "${svc_without_prefix}/v${service_version}"
+          previous_commit_count=$(git tag -l | grep "^${svc_without_prefix}/" | grep -o -E '\.\d+$' | grep -o -E '\d+$' | sort -n | head -1)
+          next_commit_count=$((previous_commit_count+1))
+          full_service_version="${service_version}.${next_commit_count}"
+          git tag -a "${svc_without_prefix}/v${full_service_version}" -m "${svc_without_prefix}/v${full_service_version}"
+          git push origin "${svc_without_prefix}/v${full_service_version}"
         done
