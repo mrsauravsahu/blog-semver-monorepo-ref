@@ -15,9 +15,9 @@ env:
   MAIN_BRANCHES: ("develop" "main")
   GITVERSION_TAG_PROPERTY_PULL_REQUESTS: .SemVer
   GITVERSION_TAG_PROPERTY_DEFAULT: .SemVer
-  GITVERSION_TAG_PROPERTY_DEVELOP: .SemVer
-  GITVERSION_TAG_PROPERTY_RELEASE: .SemVer
-  GITVERSION_TAG_PROPERTY_HOTFIX: .SemVer
+  GITVERSION_TAG_PROPERTY_DEVELOP: .MajorMinorPatch,.PreReleaseLabelWithDash
+  GITVERSION_TAG_PROPERTY_RELEASE: .MajorMinorPatch,.PreReleaseLabelWithDash
+  GITVERSION_TAG_PROPERTY_HOTFIX: .MajorMinorPatch,.PreReleaseLabelWithDash
   GITVERSION_TAG_PROPERTY_MAIN: .MajorMinorPatch
 
 jobs:
@@ -125,9 +125,21 @@ jobs:
           gitversion_calc=$(docker run --rm -v "$(pwd):/repo" ${GITVERSION} /repo /config "/repo/${svc}/.gitversion.yml")
           GITVERSION_TAG_PROPERTY_NAME="GITVERSION_TAG_PROPERTY_$(echo '${{ steps.calculate_changed_services.outputs.diff_dest }}' | sed 's|/.*$||' | tr '[[:lower:]]' '[[:upper:]]')"
           GITVERSION_TAG_PROPERTY=${!GITVERSION_TAG_PROPERTY_NAME}
-          service_version=$(echo "${gitversion_calc}" | jq -r "[${GITVERSION_TAG_PROPERTY}] | join(\"\")")
-          service_versions_txt+="- ${svc} - v${service_version}\n"
           svc_without_prefix=$(echo "${svc}" | sed "s|^apps/||")
-          git tag -a "${svc_without_prefix}/v${service_version}" -m "${svc_without_prefix}/v${service_version}"
-          git push origin "${svc_without_prefix}/v${service_version}"
+          service_version=$(echo "${gitversion_calc}" | jq -r "[${GITVERSION_TAG_PROPERTY}] | join(\"\")")
+          if [ "${GITVERSION_TAG_PROPERTY}" != ".MajorMinorPatch" ]; then
+            echo tag_filter "^${svc_without_prefix}/v$(echo "${gitversion_calc}" | jq -r ".MajorMinorPatch")-$(echo "${gitversion_calc}" | jq -r ".PreReleaseLabel")"
+            echo tags with tag_filter "$(git tag -l | grep "^${svc_without_prefix}/v$(echo "${gitversion_calc}" | jq -r ".MajorMinorPatch")-$(echo "${gitversion_calc}" | jq -r ".PreReleaseLabel")")"
+            echo tags grepped on commit count "$(git tag -l | grep "^${svc_without_prefix}/v$(echo "${gitversion_calc}" | jq -r ".MajorMinorPatch")-$(echo "${gitversion_calc}" | jq -r ".PreReleaseLabel")" | grep -o -E '\.[0-9]+$')"
+            echo tags grepped on commit count and period removed "$(git tag -l | grep "^${svc_without_prefix}/v$(echo "${gitversion_calc}" | jq -r ".MajorMinorPatch")-$(echo "${gitversion_calc}" | jq -r ".PreReleaseLabel")" | grep -o -E '\.[0-9]+$' | grep -o -E '[0-9]+$')"
+            previous_commit_count=$(git tag -l | grep "^${svc_without_prefix}/v$(echo "${gitversion_calc}" | jq -r ".MajorMinorPatch")-$(echo "${gitversion_calc}" | jq -r ".PreReleaseLabel")" | grep -o -E '\.[0-9]+$' | grep -o -E '[0-9]+$' | sort -nr | head -1)
+            echo previous_commit_count $previous_commit_count
+            next_commit_count=$((previous_commit_count+1))
+            echo next_commit_count $next_commit_count
+            full_service_version="${service_version}.${next_commit_count}"
+          else
+            full_service_version="${service_version}"
+          fi
+          git tag -a "${svc_without_prefix}/v${full_service_version}" -m "${svc_without_prefix}/v${full_service_version}"
+          git push origin "${svc_without_prefix}/v${full_service_version}"
         done
