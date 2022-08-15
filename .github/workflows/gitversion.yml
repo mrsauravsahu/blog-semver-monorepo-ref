@@ -127,7 +127,7 @@ jobs:
           GITVERSION_TAG_PROPERTY=${!GITVERSION_TAG_PROPERTY_NAME}
           svc_without_prefix=$(echo "${svc}" | sed "s|^apps/||")
           service_version=$(echo "${gitversion_calc}" | jq -r "[${GITVERSION_TAG_PROPERTY}] | join(\"\")")
-          if [ "${GITVERSION_TAG_PROPERTY}" = ".MajorMinorPatch" ]; then
+          if [ "${GITVERSION_TAG_PROPERTY}" != ".MajorMinorPatch" ]; then
             echo tag_filter "^${svc_without_prefix}/v$(echo "${gitversion_calc}" | jq -r ".MajorMinorPatch")-$(echo "${gitversion_calc}" | jq -r ".PreReleaseLabel")"
             echo tags with tag_filter "$(git tag -l | grep "^${svc_without_prefix}/v$(echo "${gitversion_calc}" | jq -r ".MajorMinorPatch")-$(echo "${gitversion_calc}" | jq -r ".PreReleaseLabel")")"
             echo tags grepped on commit count "$(git tag -l | grep "^${svc_without_prefix}/v$(echo "${gitversion_calc}" | jq -r ".MajorMinorPatch")-$(echo "${gitversion_calc}" | jq -r ".PreReleaseLabel")" | grep -o -E '\.[0-9]+$')"
